@@ -222,7 +222,8 @@ function makeComplete(provider, key, model) {
       return data.candidates[0].content.parts.map((p) => p.text || "").join("");
     };
   }
-  const host = (key || "http://localhost:11434").replace(/\/$/, "");
+  // Only a URL counts as an Ollama address; anything else (e.g. a leftover key) is ignored.
+  const host = (/^https?:\/\//i.test(key) ? key : "http://localhost:11434").replace(/\/$/, "");
   return async (system, prompt) => {
     const data = await postJson(`${host}/api/chat`, {
       model,
@@ -237,6 +238,7 @@ function makeComplete(provider, key, model) {
 
 function syncAiForm() {
   const p = $("provider").value;
+  $("apikey").value = ""; // a key for one provider must never be sent to another
   $("aihelp").textContent = AI_HELP[p];
   $("apikey").type = p === "ollama" ? "text" : "password";
   $("apikey").placeholder = p === "ollama" ? "http://localhost:11434" : "API key";
