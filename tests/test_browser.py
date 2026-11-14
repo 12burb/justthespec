@@ -54,7 +54,10 @@ def test_refine_json_uses_page_supplied_model(vendor_pdf):
         seen.append(prompt)
         return json.dumps({"summary": "Refined by the page"})
 
+    # extracting the older version for a diff must not change what gets refined
+    browser.extract_json("older.pdf", "", json.dumps(pages[:1]), remember=False)
     out = json.loads(asyncio.run(browser.refine_json("openai", complete)))
+    assert out["spec"]["info"]["title"] == "Acme Payments API Reference"
     ops = [op for item in out["spec"]["paths"].values() for op in item.values()]
     assert seen and all(op["summary"] == "Refined by the page" for op in ops)
     assert all(op["x-refined-by"] == "openai" for op in ops)

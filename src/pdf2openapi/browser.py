@@ -27,10 +27,17 @@ def document_from_words(name: str, title: str, pages: list[list[list[Any]]]) -> 
     return doc
 
 
-def extract_json(name: str, title: str, pages_json: str, fmt: str = "yaml") -> str:
-    """Extract from pdf.js words (JSON) and return spec, text, warnings and tip as JSON."""
+def extract_json(
+    name: str, title: str, pages_json: str, fmt: str = "yaml", remember: bool = True
+) -> str:
+    """Extract from pdf.js words (JSON) and return spec, text, warnings and tip as JSON.
+
+    The remembered result is what refine_json works on; pass remember=False for the older
+    version of a document that is only being diffed against.
+    """
     result = extract_document(document_from_words(name, title, json.loads(pages_json)))
-    _last["result"] = result
+    if remember:
+        _last["result"] = result
     return _result_json(result, fmt, ai_hint(result.spec))
 
 

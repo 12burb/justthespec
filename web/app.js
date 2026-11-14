@@ -93,13 +93,13 @@ async function pdfWords(data) {
   return { title, pages, numPages: pdf.numPages };
 }
 
-async function extractPdf(file) {
+async function extractPdf(file, remember = true) {
   const data = new Uint8Array(await file.arrayBuffer());
   const { title, pages, numPages } = await pdfWords(data);
   status(`Extracting endpoints from ${numPages} page${numPages === 1 ? "" : "s"}...`);
   const pyodide = await pyReady;
   const fn = pyodide.globals.get("browser").extract_json;
-  const out = JSON.parse(fn(file.name, title, JSON.stringify(pages), $("format").value));
+  const out = JSON.parse(fn(file.name, title, JSON.stringify(pages), $("format").value, remember));
   fn.destroy();
   return out;
 }
@@ -151,7 +151,7 @@ async function onOldFile(file) {
     const pyodide = await pyReady;
     let oldSpec;
     if (/\.pdf$/i.test(file.name)) {
-      oldSpec = (await extractPdf(file)).spec;
+      oldSpec = (await extractPdf(file, false)).spec;
     } else {
       const text = await file.text();
       const load = pyodide.runPython("import json, yaml\nlambda t: json.dumps(yaml.safe_load(t))");
