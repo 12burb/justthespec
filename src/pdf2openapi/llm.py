@@ -7,11 +7,12 @@ import json
 import os
 import re
 from collections.abc import Awaitable, Callable
-from typing import Any, Protocol
-
-import httpx
+from typing import TYPE_CHECKING, Any, Protocol
 
 from .extract import ExtractResult
+
+if TYPE_CHECKING:
+    import httpx
 
 SYSTEM_PROMPT = (
     "You convert excerpts of vendor API documentation into OpenAPI 3.0 operation objects. "
@@ -68,6 +69,8 @@ class _HTTPProvider:
             self.timeout = timeout
 
     def _client(self) -> httpx.AsyncClient:
+        import httpx
+
         return httpx.AsyncClient(timeout=self.timeout, transport=self._transport)
 
     async def _post(self, url: str, payload: dict[str, Any], headers: dict[str, str]) -> Any:

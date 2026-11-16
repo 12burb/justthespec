@@ -31,7 +31,9 @@ First release.
 
 ### Browser
 - A static page (GitHub Pages) runs the parser in the browser with pdf.js and Pyodide: extract
-  and diff without uploading anything. No OCR or AI there.
+  and diff without uploading anything, try a sample, and hand the result to Postman/Insomnia/
+  Bruno, the CLI or an MCP client. Optional refinement with your own OpenAI/Gemini key or local
+  Ollama, called straight from the browser. No OCR there.
 
 ### MCP
 - `pdf2openapi mcp` runs a stdio MCP server with `extract_openapi`, `read_pdf_pages`,

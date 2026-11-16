@@ -17,9 +17,10 @@ retyping it all into Postman and only notice changes when production breaks.
 ## Try it in your browser
 
 https://12burb.github.io/pdf2openapi/ runs the same parser inside your browser (via Pyodide and
-pdf.js). Drop a PDF, get the spec, compare it with the previous version. Nothing is uploaded and
-nothing is stored: there is no server behind the page. The browser version has no OCR and no AI
-step; for those, install the CLI.
+pdf.js). Drop a PDF, get the spec, compare it with the previous version, and optionally refine it
+with your own OpenAI or Gemini key or a local Ollama (the key stays in the tab). Nothing is
+uploaded and nothing is stored: there is no server behind the page. The browser version has no
+OCR; for scanned PDFs, URL watching and sandbox probing, install the CLI.
 
 ## Install
 

@@ -3,79 +3,154 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>pdf2openapi: vendor PDF API docs to OpenAPI, in your browser</title>
-<meta name="description" content="Turn a vendor's PDF API documentation into an OpenAPI spec. Runs entirely in your browser; the PDF never leaves your computer.">
+<title>pdf2openapi: turn vendor PDF API docs into an OpenAPI spec, in your browser</title>
+<meta name="description" content="Drop a vendor's PDF API documentation and get an OpenAPI spec for Postman, Insomnia, Bruno, code generators or AI assistants. Runs entirely in your browser; nothing is uploaded or stored.">
 <style>
-  :root { --fg: #1b1f23; --muted: #57606a; --bg: #fff; --line: #d0d7de; --accent: #0969da; --ok: #1a7f37; --warn: #9a6700; --bad: #cf222e; }
-  @media (prefers-color-scheme: dark) { :root { --fg: #e6edf3; --muted: #9da7b3; --bg: #0d1117; --line: #30363d; --accent: #58a6ff; --ok: #3fb950; --warn: #d29922; --bad: #f85149; } }
+  :root { --fg: #1b1f23; --muted: #57606a; --bg: #fff; --panel: #f6f8fa; --line: #d0d7de; --accent: #0969da; --ok: #1a7f37; --warn: #9a6700; --bad: #cf222e; }
+  @media (prefers-color-scheme: dark) { :root { --fg: #e6edf3; --muted: #9da7b3; --bg: #0d1117; --panel: #161b22; --line: #30363d; --accent: #58a6ff; --ok: #3fb950; --warn: #d29922; --bad: #f85149; } }
   * { box-sizing: border-box; }
   body { margin: 0; font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; color: var(--fg); background: var(--bg); }
   main { max-width: 960px; margin: 0 auto; padding: 24px 16px 64px; }
-  h1 { font-size: 1.6rem; margin: 0 0 4px; }
-  .sub { color: var(--muted); margin: 0 0 20px; }
+  h1 { font-size: 1.7rem; margin: 0 0 4px; }
+  h2 { font-size: 1.15rem; margin: 0 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 18px; }
   .badge { display: inline-block; font-size: .8rem; padding: 2px 8px; border: 1px solid var(--ok); color: var(--ok); border-radius: 999px; margin-left: 8px; vertical-align: middle; }
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 0 0 20px; padding: 0; list-style: none; }
+  .steps li { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font-size: .95rem; }
+  .steps b { display: block; margin-bottom: 2px; }
   .drop { display: block; border: 2px dashed var(--line); border-radius: 12px; padding: 32px; text-align: center; cursor: pointer; transition: border-color .15s; }
   .drop.over, .drop:hover { border-color: var(--accent); }
   .drop input { display: none; }
   .drop small { display: block; color: var(--muted); margin-top: 6px; }
+  .sample { text-align: center; margin: 10px 0 0; font-size: .95rem; color: var(--muted); }
   #status { margin: 14px 0; color: var(--muted); min-height: 1.5em; }
   #status.err { color: var(--bad); }
-  section { display: none; margin-top: 24px; }
+  section { display: none; margin-top: 28px; }
   section.show { display: block; }
   .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
   .bar .grow { flex: 1; }
-  button, select { font: inherit; padding: 6px 12px; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: var(--fg); cursor: pointer; }
+  button, select, input[type=text], input[type=password] { font: inherit; padding: 6px 12px; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: var(--fg); }
+  button { cursor: pointer; }
   button:hover { border-color: var(--accent); }
   button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-  textarea, pre { width: 100%; font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; border: 1px solid var(--line); border-radius: 8px; padding: 12px; background: transparent; color: var(--fg); white-space: pre; overflow: auto; }
-  textarea { height: 420px; resize: vertical; }
-  .note { padding: 10px 12px; border-left: 3px solid var(--warn); margin: 8px 0; font-size: .95rem; }
+  button:disabled { opacity: .5; cursor: default; }
+  textarea, pre { width: 100%; font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; border: 1px solid var(--line); border-radius: 8px; padding: 12px; background: transparent; color: var(--fg); white-space: pre; overflow: auto; margin: 0; }
+  textarea { height: 400px; resize: vertical; }
+  .note { padding: 10px 12px; border-left: 3px solid var(--warn); margin: 8px 0; font-size: .95rem; background: var(--panel); border-radius: 0 8px 8px 0; }
   .note.tip { border-color: var(--accent); }
   ul.warn { margin: 6px 0 0; padding-left: 20px; font-size: .9rem; color: var(--muted); }
   details summary { cursor: pointer; color: var(--muted); }
+  .ai { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin: 10px 0; }
+  .ai .bar { margin-bottom: 6px; }
+  .ai input[type=password], .ai input[type=text] { flex: 1; min-width: 200px; }
+  .ai small { color: var(--muted); display: block; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font-size: .95rem; }
+  .card h3 { margin: 0 0 6px; font-size: 1rem; }
+  .card p { margin: 0 0 8px; color: var(--muted); }
+  .card pre { font-size: 12px; padding: 8px 10px; }
+  .card .bar { margin: 6px 0 0; }
+  .count { font-weight: 600; }
   footer { margin-top: 48px; font-size: .9rem; color: var(--muted); }
   a { color: var(--accent); }
-  .count { font-weight: 600; }
 </style>
 </head>
 <body>
 <main>
   <h1>pdf2openapi <span class="badge">runs in your browser, nothing uploaded</span></h1>
-  <p class="sub">Drop a vendor's PDF API documentation. Get an OpenAPI 3.0 spec you can import into Postman, Insomnia or Bruno, or feed to a code generator. The PDF is read by your browser and never sent anywhere; close the tab and it is gone.</p>
+  <p class="sub">Some vendors only document their API as a PDF. Drop it here and get an OpenAPI spec: import it into Postman, Insomnia or Bruno, generate a client, or hand it to your AI assistant. Drop the next version to see what changed before it breaks production.</p>
+
+  <ul class="steps">
+    <li><b>1. Drop the PDF</b>Your browser reads it. There is no server behind this page, so nothing is uploaded or kept.</li>
+    <li><b>2. Get the spec</b>OpenAPI 3.0, with the source page of every endpoint. No account, no key, no AI.</li>
+    <li><b>3. Use it</b>Download it, import it into your API tool, or compare it with the previous PDF.</li>
+  </ul>
 
   <label class="drop" id="drop">
     <input type="file" id="file" accept="application/pdf,.pdf">
-    <strong>Drop a PDF here or click to choose</strong>
-    <small>No account, no API key, no AI. Rule-based parsing, with page citations for every endpoint.</small>
+    <strong>Drop a vendor's PDF API documentation here, or click to choose</strong>
+    <small>Rule-based parsing with page citations. Scanned (image-only) PDFs need the command-line version.</small>
   </label>
+  <p class="sample">No PDF handy? <a href="#" id="sample">Try the sample (a made-up payments API)</a>.</p>
   <div id="status">Loading the Python runtime (about 12 MB, cached after the first visit)...</div>
 
   <section id="result">
     <div class="bar">
       <span class="grow"><span class="count" id="count"></span> endpoints found in <span id="name"></span></span>
-      <select id="format"><option value="yaml">YAML</option><option value="json">JSON</option></select>
+      <select id="format" aria-label="Output format"><option value="yaml">YAML</option><option value="json">JSON</option></select>
       <button id="copy">Copy</button>
       <button id="download" class="primary">Download</button>
     </div>
     <div id="tip" class="note tip" hidden></div>
     <details id="warnings" hidden><summary></summary><ul class="warn"></ul></details>
+
+    <details class="ai" id="aibox">
+      <summary>Optional: refine with your own AI model</summary>
+      <p class="sub" style="margin:8px 0 6px">Sends each endpoint's source pages (text only, never the whole PDF) to a model you choose, which fills in summaries and fields the rule-based parser missed. The key is kept in this tab's memory and forgotten when you close it.</p>
+      <div class="bar">
+        <select id="provider" aria-label="AI provider">
+          <option value="openai">OpenAI (your API key)</option>
+          <option value="gemini">Google Gemini (your API key)</option>
+          <option value="ollama">Ollama on this computer (free, no key)</option>
+        </select>
+        <input type="password" id="apikey" placeholder="API key" autocomplete="off">
+        <input type="text" id="model" placeholder="model (optional)" autocomplete="off" style="max-width:220px">
+        <button id="refine" class="primary">Refine</button>
+      </div>
+      <small id="aihelp"></small>
+    </details>
+
     <textarea id="out" readonly spellcheck="false"></textarea>
   </section>
 
+  <section id="use">
+    <h2>Use the result</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>Postman, Insomnia, Bruno</h3>
+        <p>Download the spec, then: Postman <em>Import</em> → drop the file. Insomnia <em>Create</em> → <em>Import</em>. Bruno <em>Import collection</em> → <em>OpenAPI V3</em>. Every endpoint becomes a ready-to-send request.</p>
+        <div class="bar"><button id="download2">Download spec</button></div>
+      </div>
+      <div class="card">
+        <h3>Claude, Cursor or any MCP client</h3>
+        <p>Let your assistant convert, diff and validate PDFs itself, using its own model for the hard parts. Add this to your client's MCP config:</p>
+        <pre id="mcpcfg">{
+  "mcpServers": {
+    "pdf2openapi": { "command": "uvx", "args": ["--from", "git+https://github.com/12burb/pdf2openapi", "pdf2openapi", "mcp"] }
+  }
+}</pre>
+        <div class="bar"><button data-copy="mcpcfg">Copy config</button></div>
+      </div>
+      <div class="card">
+        <h3>Command line and CI</h3>
+        <p>Same parser, plus OCR for screenshots, a daily check of the vendor's PDF URL that fails when it changes, and a live check against the vendor's sandbox.</p>
+        <pre id="clicmd">pip install git+https://github.com/12burb/pdf2openapi
+pdf2openapi extract vendor-api.pdf -o vendor-api.yaml
+pdf2openapi diff vendor-api.yaml https://vendor.example.com/api-docs.pdf --fail-on-change</pre>
+        <div class="bar"><button data-copy="clicmd">Copy commands</button></div>
+      </div>
+      <div class="card">
+        <h3>Code generators</h3>
+        <p>Feed the spec to <a href="https://openapi-generator.tech/" rel="noopener">OpenAPI Generator</a>, <a href="https://github.com/openapi-ts/openapi-typescript" rel="noopener">openapi-typescript</a> or similar to get a typed client. Check <code>x-source-pages</code> against the PDF for anything that looks off.</p>
+      </div>
+    </div>
+  </section>
+
   <section id="diffsec">
-    <h2 style="font-size:1.1rem;margin:0 0 6px">Did the vendor change something?</h2>
-    <p class="sub" style="margin-bottom:10px">Drop the previous version of the PDF (or an older spec exported from here) to see added, removed and changed endpoints, with breaking changes flagged.</p>
+    <h2>Did the vendor change something?</h2>
+    <p class="sub" style="margin-bottom:10px">Drop the previous version of the PDF (or a spec you downloaded here earlier) to see added, removed and changed endpoints, with breaking changes flagged.</p>
     <label class="drop" id="drop2">
       <input type="file" id="file2" accept="application/pdf,.pdf,.yaml,.yml,.json">
       <strong>Drop the older PDF or spec to compare</strong>
     </label>
-    <pre id="diffout" hidden></pre>
+    <p class="sample" id="sample2wrap" hidden>Or <a href="#" id="sample2">compare the sample with its older version</a>.</p>
+    <pre id="diffout" hidden style="margin-top:10px"></pre>
   </section>
 
   <footer>
     Open source (MIT): <a href="https://github.com/12burb/pdf2openapi">github.com/12burb/pdf2openapi</a>.
-    The command-line version adds OCR for screenshots, URL watching for CI, and optional AI refinement with your own model.
-    Scanned PDFs (images only) need the CLI with Tesseract installed.
+    Report a PDF that comes out wrong by <a href="https://github.com/12burb/pdf2openapi/issues">opening an issue</a>.
+    This page is static files on GitHub Pages; it has no backend and sets no cookies.
   </footer>
 </main>
 <script type="module" src="app.js"></script>
