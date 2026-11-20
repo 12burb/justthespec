@@ -4,11 +4,11 @@ import pymupdf
 import pytest
 from conftest import PdfBuilder, build_vendor_pdf
 
-from pdf2openapi import extract, pdf
-from pdf2openapi.extract import _clean_summary, _heading_depth, normalize_path
-from pdf2openapi.pdf import ocr_available
-from pdf2openapi.schema import flatten, parse_type
-from pdf2openapi.validate import validate_spec
+from justthespec import extract, pdf
+from justthespec.extract import _clean_summary, _heading_depth, normalize_path
+from justthespec.pdf import ocr_available
+from justthespec.schema import flatten, parse_type
+from justthespec.validate import validate_spec
 
 
 @pytest.mark.parametrize(
@@ -454,7 +454,7 @@ def test_ocr_converts_rgba_and_cmyk_images(cs, alpha):
 
 
 def test_ai_hint_flags_thin_operations():
-    from pdf2openapi.extract import ai_hint
+    from justthespec.extract import ai_hint
 
     ok = {"summary": "List orders", "responses": {}}
     spec = {"paths": {"/orders": {"get": ok}}}
@@ -508,7 +508,7 @@ def test_multipart_lines_are_not_a_description(tmp_path):
     b.line('content-disposition: form-data; name="file"; filename="a.txt"')
     b.line("Content-Type: application/octet-stream")
     b.line("--AaB03x--")
-    from pdf2openapi.extract import extract as run_extract
+    from justthespec.extract import extract as run_extract
 
     spec = run_extract(b.save(tmp_path / "m.pdf"), ocr=False).spec
     op = spec["paths"]["/upload"]["post"]

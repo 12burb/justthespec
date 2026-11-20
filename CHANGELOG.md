@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.0 - 2026-11-19
+
+Renamed from `pdf2openapi` to **JustTheSpec**.
+
+- The package, command and MCP server are now `justthespec`
+  (`pip install git+https://github.com/12burb/justthespec`).
+- Environment variables are now `JUSTTHESPEC_PROVIDER`, `JUSTTHESPEC_MODEL`,
+  `JUSTTHESPEC_TIMEOUT` and `JUSTTHESPEC_ALLOW_PRIVATE_URLS`.
+- The web page moved to https://12burb.github.io/justthespec/.
+
 ## 0.1.0 - 2026-11-10
 
 First release.

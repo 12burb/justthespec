@@ -7,7 +7,7 @@ import yaml
 from mcp.shared.memory import create_connected_server_and_client_session
 from mcp.types import CreateMessageResult, TextContent
 
-from pdf2openapi.mcp_server import server
+from justthespec.mcp_server import server
 
 
 def _text(result) -> str:
@@ -58,7 +58,7 @@ def test_extract_read_diff_validate(tmp_path, vendor_pdf, vendor_pdf_v2):
 
 
 def test_use_ai_falls_back_to_client_sampling(vendor_pdf, monkeypatch):
-    for var in ("OPENAI_API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY", "PDF2OPENAPI_PROVIDER"):
+    for var in ("OPENAI_API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY", "JUSTTHESPEC_PROVIDER"):
         monkeypatch.delenv(var, raising=False)
     calls = []
 

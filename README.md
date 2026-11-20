@@ -1,11 +1,13 @@
-# pdf2openapi
+# JustTheSpec
+
+Formerly `pdf2openapi`.
 
 Turn a vendor's PDF API docs into an OpenAPI spec, and get told when the PDF changes.
 
 Some vendors only ship a 60-page PDF: endpoints are buried in prose and screenshots, the
 auth examples are wrong, and new versions arrive without a changelog. People end up
 retyping it all into Postman and only notice changes when production breaks.
-`pdf2openapi` does the retyping for you and diffs each new PDF against the last one.
+`justthespec` does the retyping for you and diffs each new PDF against the last one.
 
 - **Runs locally.** No account, no server, nothing uploaded. Your PDFs stay on your machine.
 - **No AI and no API key needed.** A rule-based parser plus OCR handles most well-structured
@@ -16,7 +18,7 @@ retyping it all into Postman and only notice changes when production breaks.
 
 ## Try it in your browser
 
-https://12burb.github.io/pdf2openapi/ runs the same parser inside your browser (via Pyodide and
+https://12burb.github.io/justthespec/ runs the same parser inside your browser (via Pyodide and
 pdf.js). Drop a PDF, get the spec, compare it with the previous version, and optionally refine it
 with your own OpenAI or Gemini key or a local Ollama (the key stays in the tab). Nothing is
 uploaded and nothing is stored: there is no server behind the page. The browser version has no
@@ -25,24 +27,24 @@ OCR; for scanned PDFs, URL watching and sandbox probing, install the CLI.
 ## Install
 
 ```bash
-pip install git+https://github.com/12burb/pdf2openapi@v0.1.0   # or omit @v0.1.0 for the latest
+pip install git+https://github.com/12burb/justthespec@v0.2.0   # or omit @v0.2.0 for the latest
 # optional, to read screenshots and scanned pages:
 sudo apt install tesseract-ocr   # macOS: brew install tesseract
 ```
 
-Or run it without installing: `uvx --from git+https://github.com/12burb/pdf2openapi pdf2openapi extract vendor-api.pdf`.
+Or run it without installing: `uvx --from git+https://github.com/12burb/justthespec justthespec extract vendor-api.pdf`.
 
 ## Use
 
 ```bash
 # PDF -> OpenAPI
-pdf2openapi extract vendor-api.pdf -o vendor-api.yaml
+justthespec extract vendor-api.pdf -o vendor-api.yaml
 
 # What changed between two versions? (PDFs, YAML/JSON specs, or URLs)
-pdf2openapi diff vendor-api-v1.pdf vendor-api-v2.pdf
+justthespec diff vendor-api-v1.pdf vendor-api-v2.pdf
 
 # Is the spec valid? Do the documented GET endpoints actually respond?
-pdf2openapi validate vendor-api.yaml --base-url https://sandbox.vendor.com -H "X-Api-Key: $KEY"
+justthespec validate vendor-api.yaml --base-url https://sandbox.vendor.com -H "X-Api-Key: $KEY"
 ```
 
 None of these need AI or a key. When the rule-based result looks thin, `extract` says so:
@@ -83,24 +85,24 @@ for that endpoint are sent, and only when you pass `--ai`.
 | Your MCP client | nothing | See below |
 
 ```bash
-pdf2openapi extract vendor-api.pdf --ai                     # uses whichever key is set
-pdf2openapi extract vendor-api.pdf --provider ollama --model llama3.1
+justthespec extract vendor-api.pdf --ai                     # uses whichever key is set
+justthespec extract vendor-api.pdf --provider ollama --model llama3.1
 ```
 
-`PDF2OPENAPI_PROVIDER` and `PDF2OPENAPI_MODEL` set defaults; `OLLAMA_HOST` points at a remote
-Ollama (default `http://localhost:11434`). `PDF2OPENAPI_TIMEOUT` sets the per-request
+`JUSTTHESPEC_PROVIDER` and `JUSTTHESPEC_MODEL` set defaults; `OLLAMA_HOST` points at a remote
+Ollama (default `http://localhost:11434`). `JUSTTHESPEC_TIMEOUT` sets the per-request
 timeout in seconds (default 180, or 900 for Ollama). On a CPU-only machine a local model takes
 roughly 15-60 seconds per endpoint, so start with a small model such as `qwen2.5:3b`.
 
 ## Use from Claude, Cursor or any MCP client
 
-`pdf2openapi mcp` runs an MCP server over stdio. Add it to your client config, for example
+`justthespec mcp` runs an MCP server over stdio. Add it to your client config, for example
 Claude Desktop's `claude_desktop_config.json` or Cursor's `.cursor/mcp.json`:
 
 ```json
 {
   "mcpServers": {
-    "pdf2openapi": { "command": "pdf2openapi", "args": ["mcp"] }
+    "justthespec": { "command": "justthespec", "args": ["mcp"] }
   }
 }
 ```
@@ -130,14 +132,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: pip install git+https://github.com/12burb/pdf2openapi
-      - run: pdf2openapi diff specs/vendor.yaml https://vendor.example.com/api-docs.pdf --fail-on-change
+      - run: pip install git+https://github.com/12burb/justthespec
+      - run: justthespec diff specs/vendor.yaml https://vendor.example.com/api-docs.pdf --fail-on-change
 ```
 
 A failing run means the PDF changed. The log shows what changed and which changes break clients.
 
 URLs must resolve to public addresses (each redirect is checked; at most 5 redirects and
-100 MB). To diff a document on a private network, set `PDF2OPENAPI_ALLOW_PRIVATE_URLS=1`.
+100 MB). To diff a document on a private network, set `JUSTTHESPEC_ALLOW_PRIVATE_URLS=1`.
 
 ## Limitations
 

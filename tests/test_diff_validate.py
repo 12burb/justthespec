@@ -5,10 +5,10 @@ import pytest
 import yaml
 from conftest import PdfBuilder
 
-from pdf2openapi.cli import main
-from pdf2openapi.diff import diff_specs, load_spec
-from pdf2openapi.extract import extract
-from pdf2openapi.validate import probe
+from justthespec.cli import main
+from justthespec.diff import diff_specs, load_spec
+from justthespec.extract import extract
+from justthespec.validate import probe
 
 
 def test_diff_between_pdf_versions(vendor_pdf, vendor_pdf_v2):
@@ -53,7 +53,7 @@ def test_cli_extract_and_diff_exit_codes(tmp_path, vendor_pdf, vendor_pdf_v2, ca
 
 
 def test_cli_ai_without_key_fails_cleanly(vendor_pdf, monkeypatch, capsys):
-    for var in ("OPENAI_API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY", "PDF2OPENAPI_PROVIDER"):
+    for var in ("OPENAI_API_KEY", "GEMINI_API_KEY", "GOOGLE_API_KEY", "JUSTTHESPEC_PROVIDER"):
         monkeypatch.delenv(var, raising=False)
     assert main(["extract", str(vendor_pdf), "--ai"]) == 2
     assert "no AI provider configured" in capsys.readouterr().err
@@ -163,7 +163,7 @@ def test_probe_skips_network_path_urls():
 def test_load_spec_refuses_private_urls(monkeypatch):
     import pytest
 
-    monkeypatch.delenv("PDF2OPENAPI_ALLOW_PRIVATE_URLS", raising=False)
+    monkeypatch.delenv("JUSTTHESPEC_ALLOW_PRIVATE_URLS", raising=False)
     with pytest.raises(ValueError, match="non-public"):
         load_spec("http://127.0.0.1:9/spec.yaml")
 
@@ -196,9 +196,9 @@ def test_diff_oauth_scope_change_is_breaking():
 def test_fetch_pins_checked_ip(monkeypatch):
     import socket
 
-    from pdf2openapi.diff import _request_target
+    from justthespec.diff import _request_target
 
-    monkeypatch.delenv("PDF2OPENAPI_ALLOW_PRIVATE_URLS", raising=False)
+    monkeypatch.delenv("JUSTTHESPEC_ALLOW_PRIVATE_URLS", raising=False)
     monkeypatch.setattr(
         socket, "getaddrinfo", lambda *a, **k: [(2, 1, 6, "", ("93.184.216.34", 443))]
     )
@@ -209,7 +209,7 @@ def test_fetch_pins_checked_ip(monkeypatch):
 
 
 def test_fetch_credentials_not_sent_to_redirect_target():
-    from pdf2openapi.diff import fetch_url
+    from justthespec.diff import fetch_url
 
     seen = []
 
@@ -235,7 +235,7 @@ def test_cli_extract_tip_only_without_ai(tmp_path, capsys):
 
 
 def test_inferred_response_warnings_are_collapsed():
-    from pdf2openapi.validate import validate_spec
+    from justthespec.validate import validate_spec
 
     op = {"responses": {"200": {"description": "ok"}}, "x-inferred-responses": True}
     spec = {"openapi": "3.0.3", "info": {"title": "t", "version": "1"}, "paths": {}}
@@ -267,7 +267,7 @@ def test_cli_reports_unreadable_inputs(tmp_path, capsys):
 
 
 def test_fetch_errors_name_the_original_url():
-    from pdf2openapi.diff import fetch_url
+    from justthespec.diff import fetch_url
 
     def refused(request):
         raise httpx.ConnectError("connection refused")

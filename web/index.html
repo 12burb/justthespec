@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>pdf2openapi: turn vendor PDF API docs into an OpenAPI spec, in your browser</title>
+<title>JustTheSpec: turn vendor PDF API docs into an OpenAPI spec, in your browser</title>
 <meta name="description" content="Drop a vendor's PDF API documentation and get an OpenAPI spec for Postman, Insomnia, Bruno, code generators or AI assistants. Runs entirely in your browser; nothing is uploaded or stored.">
 <style>
   :root { --fg: #1b1f23; --muted: #57606a; --bg: #fff; --panel: #f6f8fa; --line: #d0d7de; --accent: #0969da; --ok: #1a7f37; --warn: #9a6700; --bad: #cf222e; }
@@ -57,7 +57,7 @@
 </head>
 <body>
 <main>
-  <h1>pdf2openapi <span class="badge">runs in your browser, nothing uploaded</span></h1>
+  <h1>JustTheSpec <span class="badge">runs in your browser, nothing uploaded</span></h1>
   <p class="sub">Some vendors only document their API as a PDF. Drop it here and get an OpenAPI spec: import it into Postman, Insomnia or Bruno, generate a client, or hand it to your AI assistant. Drop the next version to see what changed before it breaks production.</p>
 
   <ul class="steps">
@@ -116,7 +116,7 @@
         <p>Let your assistant convert, diff and validate PDFs itself, using its own model for the hard parts. Add this to your client's MCP config:</p>
         <pre id="mcpcfg">{
   "mcpServers": {
-    "pdf2openapi": { "command": "uvx", "args": ["--from", "git+https://github.com/12burb/pdf2openapi", "pdf2openapi", "mcp"] }
+    "justthespec": { "command": "uvx", "args": ["--from", "git+https://github.com/12burb/justthespec", "justthespec", "mcp"] }
   }
 }</pre>
         <div class="bar"><button data-copy="mcpcfg">Copy config</button></div>
@@ -124,9 +124,9 @@
       <div class="card">
         <h3>Command line and CI</h3>
         <p>Same parser, plus OCR for screenshots, a daily check of the vendor's PDF URL that fails when it changes, and a live check against the vendor's sandbox.</p>
-        <pre id="clicmd">pip install git+https://github.com/12burb/pdf2openapi
-pdf2openapi extract vendor-api.pdf -o vendor-api.yaml
-pdf2openapi diff vendor-api.yaml https://vendor.example.com/api-docs.pdf --fail-on-change</pre>
+        <pre id="clicmd">pip install git+https://github.com/12burb/justthespec
+justthespec extract vendor-api.pdf -o vendor-api.yaml
+justthespec diff vendor-api.yaml https://vendor.example.com/api-docs.pdf --fail-on-change</pre>
         <div class="bar"><button data-copy="clicmd">Copy commands</button></div>
       </div>
       <div class="card">
@@ -148,8 +148,8 @@ pdf2openapi diff vendor-api.yaml https://vendor.example.com/api-docs.pdf --fail-
   </section>
 
   <footer>
-    Open source (MIT): <a href="https://github.com/12burb/pdf2openapi">github.com/12burb/pdf2openapi</a>.
-    Report a PDF that comes out wrong by <a href="https://github.com/12burb/pdf2openapi/issues">opening an issue</a>.
+    Open source (MIT): <a href="https://github.com/12burb/justthespec">github.com/12burb/justthespec</a>.
+    Report a PDF that comes out wrong by <a href="https://github.com/12burb/justthespec/issues">opening an issue</a>.
     This page is static files on GitHub Pages; it has no backend and sets no cookies.
   </footer>
 </main>
