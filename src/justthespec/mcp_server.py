@@ -1,4 +1,4 @@
-"""MCP server: lets Claude, Cursor and other MCP clients call pdf2openapi.
+"""MCP server: lets Claude, Cursor and other MCP clients call justthespec.
 
 When AI refinement is requested and no API key is configured, the server asks the
 client's own model through MCP sampling, so the user needs no extra key.
@@ -22,7 +22,7 @@ MAX_READ_CHARS = 60000
 SPEC_SUFFIXES = (".yaml", ".yml", ".json")
 
 server = FastMCP(
-    "pdf2openapi",
+    "justthespec",
     instructions=(
         "Convert vendor PDF API documentation into OpenAPI specs, compare doc versions, "
         "and validate specs. Paths refer to files on the user's machine."

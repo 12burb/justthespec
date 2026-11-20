@@ -176,7 +176,7 @@ class CallableProvider:
 
 def configured_provider_name(env: dict[str, str] | None = None) -> str | None:
     env = dict(os.environ) if env is None else env
-    explicit = env.get("PDF2OPENAPI_PROVIDER", "").strip().lower()
+    explicit = env.get("JUSTTHESPEC_PROVIDER", "").strip().lower()
     if explicit:
         return explicit
     if env.get("OPENAI_API_KEY"):
@@ -199,11 +199,11 @@ def resolve_provider(
             "no AI provider configured. Set OPENAI_API_KEY or GEMINI_API_KEY, "
             "or use --provider ollama for a free local model."
         )
-    model = model or env.get("PDF2OPENAPI_MODEL") or DEFAULT_MODELS.get(name)
+    model = model or env.get("JUSTTHESPEC_MODEL") or DEFAULT_MODELS.get(name)
     try:
-        timeout = float(env.get("PDF2OPENAPI_TIMEOUT") or 0) or None
+        timeout = float(env.get("JUSTTHESPEC_TIMEOUT") or 0) or None
     except ValueError as exc:
-        raise ProviderError("PDF2OPENAPI_TIMEOUT must be a number of seconds") from exc
+        raise ProviderError("JUSTTHESPEC_TIMEOUT must be a number of seconds") from exc
     kw: dict[str, Any] = {"transport": transport, "timeout": timeout}
     if name == "openai":
         key = env.get("OPENAI_API_KEY")

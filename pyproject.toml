@@ -3,8 +3,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "pdf2openapi"
-version = "0.1.0"
+name = "justthespec"
+version = "0.2.0"
 description = "Turn vendor PDF API docs into OpenAPI specs, and get alerted when the PDF changes."
 readme = "README.md"
 license = "MIT"
@@ -31,15 +31,15 @@ dependencies = [
 dev = ["pytest>=8", "ruff>=0.5"]
 
 [project.scripts]
-pdf2openapi = "pdf2openapi.cli:main"
+justthespec = "justthespec.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/12burb/pdf2openapi"
-Changelog = "https://github.com/12burb/pdf2openapi/blob/main/CHANGELOG.md"
-Issues = "https://github.com/12burb/pdf2openapi/issues"
+Homepage = "https://github.com/12burb/justthespec"
+Changelog = "https://github.com/12burb/justthespec/blob/main/CHANGELOG.md"
+Issues = "https://github.com/12burb/justthespec/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/pdf2openapi"]
+packages = ["src/justthespec"]
 
 [tool.ruff]
 line-length = 100

@@ -10,7 +10,7 @@ Releases are GitHub releases only. There is no PyPI account, token or hosting in
 Users install with:
 
 ```bash
-pip install git+https://github.com/12burb/pdf2openapi@v0.1.0
+pip install git+https://github.com/12burb/justthespec@v0.2.0
 ```
 
 or download the wheel from the release page.

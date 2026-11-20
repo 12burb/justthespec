@@ -6,8 +6,8 @@ import json
 import httpx
 import pytest
 
-from pdf2openapi import llm
-from pdf2openapi.extract import extract
+from justthespec import llm
+from justthespec.extract import extract
 
 
 class FakeProvider:
@@ -93,7 +93,7 @@ def test_openai_request_shape():
 
 def test_gemini_request_shape():
     seen, transport = _capture({"candidates": [{"content": {"parts": [{"text": "{}"}]}}]})
-    env = {"GEMINI_API_KEY": "g-test", "PDF2OPENAPI_MODEL": "gemini-x"}
+    env = {"GEMINI_API_KEY": "g-test", "JUSTTHESPEC_MODEL": "gemini-x"}
     p = llm.resolve_provider(env=env, transport=transport)
     assert asyncio.run(p.complete("sys", "hi")) == "{}"
     assert seen["url"].endswith("/models/gemini-x:generateContent")
@@ -176,10 +176,10 @@ def test_timeout_and_ollama_context():
     assert p.timeout == 900
     asyncio.run(p.complete("s", "p"))
     assert seen["body"]["options"]["num_ctx"] >= 16384
-    env = {"OPENAI_API_KEY": "x", "PDF2OPENAPI_TIMEOUT": "42"}
+    env = {"OPENAI_API_KEY": "x", "JUSTTHESPEC_TIMEOUT": "42"}
     assert llm.resolve_provider(env=env).timeout == 42
     with pytest.raises(llm.ProviderError):
-        llm.resolve_provider(env={**env, "PDF2OPENAPI_TIMEOUT": "soon"})
+        llm.resolve_provider(env={**env, "JUSTTHESPEC_TIMEOUT": "soon"})
 
 
 def test_stray_ai_path_params_become_body_fields(vendor_pdf):
@@ -202,7 +202,7 @@ def test_stray_ai_path_params_become_body_fields(vendor_pdf):
         ("query", "channel"),
         ("path", "order_id"),
     }
-    from pdf2openapi.validate import validate_spec
+    from justthespec.validate import validate_spec
 
     assert validate_spec(result.spec)[0] == []
 

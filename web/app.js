@@ -1,4 +1,4 @@
-// Everything happens in this tab: pdf.js reads the PDF, Pyodide runs the pdf2openapi parser.
+// Everything happens in this tab: pdf.js reads the PDF, Pyodide runs the justthespec parser.
 // The optional AI step calls the provider you choose straight from the browser.
 import * as pdfjsLib from "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs";
 import { loadPyodide } from "https://cdn.jsdelivr.net/pyodide/v0.29.5/full/pyodide.mjs";
@@ -33,7 +33,7 @@ const pyReady = (async () => {
   const manifest = await (await fetch("wheel.json", { cache: "no-cache" })).json();
   const micropip = pyodide.pyimport("micropip");
   await micropip.install.callKwargs(new URL(manifest.wheel, location.href).href, { deps: false });
-  pyodide.runPython("import pdf2openapi.browser as browser");
+  pyodide.runPython("import justthespec.browser as browser");
   return pyodide;
 })();
 
@@ -312,7 +312,7 @@ $("sample2").addEventListener("click", async (e) => {
 $("format").addEventListener("change", async () => {
   if (!current) return;
   const pyodide = await pyReady;
-  const dump = pyodide.pyimport("pdf2openapi.output").dump;
+  const dump = pyodide.pyimport("justthespec.output").dump;
   current.text = dump(pyodide.toPy(current.spec), $("format").value);
   dump.destroy();
   $("out").value = current.text;

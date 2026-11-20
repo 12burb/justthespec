@@ -103,7 +103,7 @@ def cmd_mcp(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="pdf2openapi",
+        prog="justthespec",
         description="Turn vendor PDF API docs into OpenAPI specs and detect when they change.",
     )
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")

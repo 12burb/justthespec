@@ -4,8 +4,8 @@ import json
 
 import pymupdf
 
-from pdf2openapi import browser
-from pdf2openapi.extract import extract
+from justthespec import browser
+from justthespec.extract import extract
 
 
 def _words(pdf_path):
@@ -35,7 +35,7 @@ def test_browser_module_does_not_need_pymupdf_or_httpx(monkeypatch):
 
     code = (
         "import sys; sys.modules['pymupdf'] = None; sys.modules['httpx'] = None; "
-        "import pdf2openapi.browser as b; "
+        "import justthespec.browser as b; "
         "print(b.extract_json('x.pdf', 't', '[[[0,0,50,10,\"GET\"],[60,0,120,10,\"/v1/a\"]]]'))"
     )
     out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
