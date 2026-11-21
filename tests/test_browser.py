@@ -78,3 +78,12 @@ def test_gap_after_url_scheme_is_closed():
     ]
     doc = browser.document_from_words("x.pdf", "", [words])
     assert doc.pages[0].text == "GET https://{Endpoint}/v3/projects"
+    prose = [
+        [0, 0, 20, 10, "Use"],
+        [24, 0, 60, 10, "https://"],
+        [64, 0, 80, 10, "and"],
+        [84, 0, 99, 10, "TLS"],
+    ]
+    assert browser.document_from_words("x.pdf", "", [prose]).pages[0].text == "Use https:// and TLS"
+    host = [[0, 0, 60, 10, "https://"], [64, 0, 160, 10, "api.acme.test"]]
+    assert browser.document_from_words("x.pdf", "", [host]).pages[0].text == "https://api.acme.test"

@@ -17,7 +17,8 @@ from .extract import ExtractResult, ai_hint, extract_document
 from .output import dump
 
 _last: dict[str, ExtractResult] = {}
-_SCHEME_GAP_RE = re.compile(r"(https?://) (?=[\w{])")
+# Only when what follows looks like the rest of a URL, not prose ("use https:// and ...").
+_SCHEME_GAP_RE = re.compile(r"(https?://) (?=\{\w+\}|[\w.-]+\.[a-z]{2,}\b|[\w.-]+/)")
 
 
 def document_from_words(name: str, title: str, pages: list[list[list[Any]]]) -> pdf.Document:
