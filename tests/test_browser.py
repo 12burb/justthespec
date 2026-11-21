@@ -68,3 +68,25 @@ def test_refine_json_uses_page_supplied_model(vendor_pdf):
 
     out = json.loads(asyncio.run(browser.refine_json("openai", bad_key)))
     assert [w for w in out["warnings"] if "stopped" in w and "HTTP 401" in w]
+
+
+def test_gap_after_url_scheme_is_closed():
+    words = [
+        [0, 0, 20, 10, "GET"],
+        [24, 0, 60, 10, "https://"],
+        [64, 0, 160, 10, "{Endpoint}/v3/projects"],
+    ]
+    doc = browser.document_from_words("x.pdf", "", [words])
+    assert doc.pages[0].text == "GET https://{Endpoint}/v3/projects"
+    prose = [
+        [0, 0, 20, 10, "Use"],
+        [24, 0, 60, 10, "https://"],
+        [64, 0, 80, 10, "and"],
+        [84, 0, 99, 10, "TLS"],
+    ]
+    assert browser.document_from_words("x.pdf", "", [prose]).pages[0].text == "Use https:// and TLS"
+    host = [[0, 0, 60, 10, "https://"], [64, 0, 160, 10, "api.acme.test"]]
+    assert browser.document_from_words("x.pdf", "", [host]).pages[0].text == "https://api.acme.test"
+    for rest in ("192.168.1.10:8443/api/v1", "{host-name}/v1/things", "localhost:8080", "10.0.0.5"):
+        split = [[0, 0, 60, 10, "http://"], [64, 0, 200, 10, rest]]
+        assert browser.document_from_words("x.pdf", "", [split]).pages[0].text == "http://" + rest
