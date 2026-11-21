@@ -17,13 +17,17 @@ from .extract import ExtractResult, ai_hint, extract_document
 from .output import dump
 
 _last: dict[str, ExtractResult] = {}
+_SCHEME_GAP_RE = re.compile(r"(https?://) (?=[\w{])")
 
 
 def document_from_words(name: str, title: str, pages: list[list[list[Any]]]) -> pdf.Document:
     """Build a Document from per-page word boxes: [[x0, y0, x1, y1, text], ...] per page."""
     doc = pdf.Document(path=name, title=(title or "").strip())
     for number, words in enumerate(pages, start=1):
-        doc.pages.append(pdf.Page(number=number, text=pdf.lines_from_words(words)))
+        text = pdf.lines_from_words(words)
+        # pdf.js can leave a gap after the scheme ("https:// {Endpoint}/v3"); URLs have none.
+        text = _SCHEME_GAP_RE.sub(r"\1", text)
+        doc.pages.append(pdf.Page(number=number, text=text))
     return doc
 
 

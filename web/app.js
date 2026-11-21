@@ -242,7 +242,7 @@ function syncAiForm() {
   $("aihelp").textContent = AI_HELP[p];
   $("apikey").type = p === "ollama" ? "text" : "password";
   $("apikey").placeholder = p === "ollama" ? "http://localhost:11434" : "API key";
-  $("model").placeholder = `model (default ${DEFAULT_MODELS[p]})`;
+  $("model").placeholder = `model: ${DEFAULT_MODELS[p]}`;
 }
 
 async function onRefine() {
